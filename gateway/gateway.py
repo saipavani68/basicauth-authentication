@@ -39,7 +39,11 @@ def check_credentials(username, password):
             url,
             data=data
         )
-    return response
+
+    if (response.json() == True):
+        return True
+    else:
+        return False
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""
