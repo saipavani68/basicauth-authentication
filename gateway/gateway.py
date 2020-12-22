@@ -23,6 +23,8 @@ basic_auth = BasicAuth(app)
 
 app.config.from_envvar('APP_CONFIG')
 users = app.config['USERS']
+
+global userNodesList, timelinesNodesList
 userNodesList = users['nodes']
 userNodes = itertools.cycle(userNodesList)
 userApiResources = users['endpoints']
@@ -83,12 +85,15 @@ def route_page(err):
             cookies=flask.request.cookies,
             stream=True,
         )
+            
     except requests.exceptions.RequestException as e:
         #removing node or server in case of connection refused error or HTTP status code in the 500 range
         if curr_node in userNodesList:
-            userNodesList.remove(curr_node)
-        else:
-            timelinesNodesList.remove(curr_node)
+            index = userNodesList.index(curr_node)
+            del userNodesList[index]
+        elif curr_node in timelinesNodesList:
+            index = timelinesNodesList.index(curr_node)
+            del timelinesNodesList[index]
         return flask.json.jsonify({
             'method': e.request.method,
             'url': e.request.url,
